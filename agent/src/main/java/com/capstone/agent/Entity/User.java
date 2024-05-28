@@ -1,4 +1,4 @@
-package com.capstone.agent.Entity;
+package com.capstone.agent.entity;
 
 import java.time.LocalDateTime;
 
