@@ -2,11 +2,15 @@ package com.capstone.agent.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,16 +18,13 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Builder
 @Entity
+@Table(name = "users")
 public class User {
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "username", nullable = false)
-    private String username;
+    private int id;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -31,23 +32,34 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "age", nullable = false)
     private int age;
+
+    @Column(name = "gender", nullable = false)
     private String gender;
-    private String address;
+
+    @Column(name = "addr", nullable = false)
+    private String addr;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public User(Long id, String username, String email, String password,
-                int age, String gender, String address,
-                LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.username = username;
+    @Builder
+    public User(String email, String password, String name,
+                int age, String gender, String addr) {
         this.email = email;
         this.password = password;
+        this.name = name;
         this.age = age;
         this.gender = gender;
-        this.address = address;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.addr = addr;
     }
 }
