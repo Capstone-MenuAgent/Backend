@@ -1,8 +1,14 @@
 package com.capstone.agent.controller;
 import com.capstone.agent.dto.LoginDTO;
 import com.capstone.agent.dto.SignupDTO;
+import com.capstone.agent.entity.Chatlog;
 import com.capstone.agent.dto.InfoDTO;
+import com.capstone.agent.dto.LogDTO;
+import com.capstone.agent.service.ChatlogService;
 import com.capstone.agent.service.UserService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final ChatlogService chatlogService;
 
     @PostMapping("/login")
     @ResponseBody
@@ -43,7 +50,15 @@ public class UserController {
 
     @GetMapping("/chatlog")
     @ResponseBody
-    public String getUserHistory(@RequestParam String userId) {
-        return String.format("유저 사용 기록 %s", userId);
+    public List<LogDTO> getUserHistory(@RequestParam int userId) {
+        List<Chatlog> chatlogs = chatlogService.loadLog(userId);
+        List<LogDTO> logs = chatlogs.stream()
+                                    .map(log -> LogDTO.builder()
+                                                      .role(log.getRole())
+                                                      .chat(log.getChat())
+                                                      .created_at(log.getCreated_at())
+                                                      .build())
+                                    .collect(Collectors.toList());
+        return logs;
     }
 }
