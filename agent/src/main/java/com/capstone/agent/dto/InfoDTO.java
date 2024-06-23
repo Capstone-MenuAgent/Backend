@@ -1,11 +1,10 @@
 package com.capstone.agent.dto;
 
-
 import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class SignupDTO {
+public class InfoDTO {
     private String email;
     private String password;
     private String name;
@@ -14,9 +13,9 @@ public class SignupDTO {
     private String addr;
     
     @Builder
-    public SignupDTO(String email, String password,
-                     String name, int age,
-                     String gender, String addr) {
+    public InfoDTO(String email, String password,
+                    String name, int age,
+                    String gender, String addr) {
         this.email = email;
         this.password = password;
         this.name = name;

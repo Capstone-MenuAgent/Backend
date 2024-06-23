@@ -1,9 +1,9 @@
 package com.capstone.agent.service;
-import com.capstone.agent.dto.LoginDTO;
-import com.capstone.agent.dto.SignupDTO;
-
 import org.springframework.stereotype.Service;
 
+import com.capstone.agent.dto.InfoDTO;
+import com.capstone.agent.dto.LoginDTO;
+import com.capstone.agent.dto.SignupDTO;
 import com.capstone.agent.entity.User;
 import com.capstone.agent.repository.UserRepository;
 
@@ -16,8 +16,8 @@ public class UserService {
 
     public void signup(SignupDTO entity) {
         User newUser = User.builder()
-                            .email(entity.getUserEmail())
-                            .password(entity.getUserPassword())
+                            .email(entity.getEmail())
+                            .password(entity.getPassword())
                             .name(entity.getName())
                             .age(entity.getAge())
                             .gender(entity.getGender())
@@ -35,7 +35,17 @@ public class UserService {
         return user.getId();
     }
 
-    public User getUserInfo(String email) {
-        return userRepository.findByEmail(email);
+    public InfoDTO getUserInfo(int id) {
+        User user = userRepository.findById(id);
+        
+        InfoDTO info = InfoDTO.builder()
+                               .email(user.getEmail())
+                               .password(user.getPassword())
+                               .name(user.getName())
+                               .age(user.getAge())
+                               .gender(user.getGender())
+                               .addr(user.getAddr())
+                               .build();
+        return info;
     }
 }

@@ -1,6 +1,7 @@
 package com.capstone.agent.controller;
 import com.capstone.agent.dto.LoginDTO;
 import com.capstone.agent.dto.SignupDTO;
+import com.capstone.agent.dto.InfoDTO;
 import com.capstone.agent.entity.User;
 import com.capstone.agent.service.UserService;
 
@@ -37,8 +38,8 @@ public class UserController {
 
     @GetMapping("/information")
     @ResponseBody
-    public String getUserInformation(@RequestParam String userId) {
-        return String.format("회원 정보 확인 %s", userId);
+    public InfoDTO getUserInformation(@RequestParam int userId) {
+        return userService.getUserInfo(userId);
     }
 
     @GetMapping("/chatlog")
