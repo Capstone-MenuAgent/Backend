@@ -1,4 +1,6 @@
 package com.capstone.agent.controller;
+import com.capstone.agent.dto.LoginDTO;
+import com.capstone.agent.service.UserService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
+    private final UserService userService;
+
     @PostMapping("/login")
     @ResponseBody
-    public String userLogin(@RequestBody String entity) {
-        return String.format("로그인 정보 확인 %s", entity);
+    public String userLogin(@RequestBody LoginDTO entity) {
+        return String.format("로그인 정보 확인 %d", userService.login(entity.getUserEmail(), entity.getUserPassword()));
     }
 
     @PostMapping("/signup")
@@ -29,13 +33,13 @@ public class UserController {
 
     @GetMapping("/information")
     @ResponseBody
-    public String getUserInformation(@RequestParam String userID) {
-        return String.format("회원 정보 확인 %s", userID);
+    public String getUserInformation(@RequestParam String userId) {
+        return String.format("회원 정보 확인 %s", userId);
     }
 
-    @GetMapping("/history")
+    @GetMapping("/chatlog")
     @ResponseBody
-    public String getUserHistory(@RequestParam(name="st") String start, @RequestParam(name = "ed") String end) {
-        return String.format("유저 사용 기록 시작 : %s 종료 : %s", start, end);
+    public String getUserHistory(@RequestParam String userId) {
+        return String.format("유저 사용 기록 %s", userId);
     }
 }
