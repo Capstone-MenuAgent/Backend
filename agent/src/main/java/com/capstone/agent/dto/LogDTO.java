@@ -2,6 +2,8 @@ package com.capstone.agent.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,6 +11,7 @@ import lombok.Data;
 public class LogDTO {
     private String role;
     private String chat;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime created_at;
 
     @Builder
