@@ -2,7 +2,6 @@ package com.capstone.agent.controller;
 import com.capstone.agent.dto.LoginDTO;
 import com.capstone.agent.dto.SignupDTO;
 import com.capstone.agent.dto.InfoDTO;
-import com.capstone.agent.entity.User;
 import com.capstone.agent.service.UserService;
 
 import org.springframework.web.bind.annotation.GetMapping;
