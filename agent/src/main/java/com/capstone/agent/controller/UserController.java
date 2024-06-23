@@ -1,5 +1,7 @@
 package com.capstone.agent.controller;
 import com.capstone.agent.dto.LoginDTO;
+import com.capstone.agent.dto.SignupDTO;
+import com.capstone.agent.entity.User;
 import com.capstone.agent.service.UserService;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,14 +23,16 @@ public class UserController {
 
     @PostMapping("/login")
     @ResponseBody
-    public String userLogin(@RequestBody LoginDTO entity) {
-        return String.format("로그인 정보 확인 %d", userService.login(entity.getUserEmail(), entity.getUserPassword()));
+    public int userLogin(@RequestBody LoginDTO entity) {
+        userService.login(entity);
+        return 200;
     }
 
     @PostMapping("/signup")
     @ResponseBody
-    public String userSignup(@RequestBody String entity) {
-        return entity;
+    public int userSignup(@RequestBody SignupDTO entity) {
+        userService.signup(entity);
+        return 200;
     }
 
     @GetMapping("/information")
