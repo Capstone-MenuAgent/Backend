@@ -1,22 +1,24 @@
 package com.capstone.agent.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
     @PostMapping("/login")
     @ResponseBody
     public String userLogin(@RequestBody String entity) {
-        return entity;
+        return String.format("로그인 정보 확인 %s", entity);
     }
 
     @PostMapping("/signup")
@@ -25,7 +27,7 @@ public class UserController {
         return entity;
     }
 
-    @GetMapping("/userinformation")
+    @GetMapping("/information")
     @ResponseBody
     public String getUserInformation(@RequestParam String userID) {
         return String.format("회원 정보 확인 %s", userID);
