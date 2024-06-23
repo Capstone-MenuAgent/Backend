@@ -1,17 +1,57 @@
 package com.capstone.agent.controller;
+import com.capstone.agent.service.UserService;
 
-import org.springframework.stereotype.Controller;
+import jakarta.servlet.http.HttpServletRequest;
+
+import com.capstone.agent.dto.InfoDTO;
+
+import java.net.URI;
+import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class AgentController {
-    @GetMapping("/main")
+    private final UserService userService;
+    
+    @GetMapping("agent/question")
     @ResponseBody
-    public String mainPage() {
-        return "대화 내용 반환 예정";
+    public ResponseEntity<?> userQuestion(@RequestParam String query, HttpServletRequest request) {
+        
+        InfoDTO info = userService.getUserInfo(1);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            String encodedQuery = URLEncoder.encode(query, "UTF-8");
+            int age = info.getAge();
+            String encodedGender = URLEncoder.encode(info.getGender(), "UTF-8");
+            String encodedAddr = URLEncoder.encode(info.getAddr(), "UTF-8");
+            String encodedParams = String.format("?query=%s&age=%d&gender=%s&loc=%s", encodedQuery, age, encodedGender, encodedAddr);
+            String agentPort = "5000";
+            String newUrl = String.format("%s://%s:%s/question/%s",
+                                           request.getScheme(),
+                                           request.getServerName(),
+                                           agentPort,
+                                           encodedParams );
+            headers.setLocation(URI.create(newUrl));
+            return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("agent/answer")
+    public String agentAnswer(@RequestParam String ans) {
+        return ans;
     }
 }
