@@ -44,5 +44,4 @@ public class Chatlog {
         this.role = role;
         this.chat = chat;
     }
-    
 }
