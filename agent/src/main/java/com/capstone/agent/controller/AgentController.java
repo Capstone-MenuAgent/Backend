@@ -1,4 +1,5 @@
 package com.capstone.agent.controller;
+import com.capstone.agent.service.ChatlogService;
 import com.capstone.agent.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,12 +24,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AgentController {
     private final UserService userService;
+    private final ChatlogService chatlogService;
     
     @GetMapping("agent/question")
     @ResponseBody
     public ResponseEntity<?> userQuestion(@RequestParam String query, HttpServletRequest request) {
-        
-        InfoDTO info = userService.getUserInfo(1);
+        int userId = 1;
+        InfoDTO info = userService.getUserInfo(userId);
+        this.chatlogService.saveLog(userId, "human", query);
         try {
             HttpHeaders headers = new HttpHeaders();
             String encodedQuery = URLEncoder.encode(query, "UTF-8");
@@ -52,6 +55,8 @@ public class AgentController {
 
     @GetMapping("agent/answer")
     public String agentAnswer(@RequestParam String ans) {
+        int userId = 1;
+        this.chatlogService.saveLog(userId, "agent", ans);
         return ans;
     }
 }
