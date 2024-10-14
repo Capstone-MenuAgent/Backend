@@ -1,19 +1,22 @@
-package com.capstone.agent.controller;
-import com.capstone.agent.service.ChatlogService;
-import com.capstone.agent.service.UserService;
+package com.capstone.agent.legacy.controller;
+import com.capstone.agent.legacy.service.ChatlogService;
+import com.capstone.agent.legacy.service.UserService;
+import com.capstone.agent.legacy.dto.InfoDTO;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import com.capstone.agent.dto.InfoDTO;
-
 import java.net.URI;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.io.UnsupportedEncodingException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,12 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@CrossOrigin(origins = "*", methods = RequestMethod.GET)
 @RequiredArgsConstructor
 public class AgentController {
     private final UserService userService;
     private final ChatlogService chatlogService;
     
-    @GetMapping("agent/question")
+    @GetMapping("/agent/question")
     @ResponseBody
     public ResponseEntity<?> userQuestion(@RequestParam String query, HttpServletRequest request) {
         int userId = 1;
@@ -53,10 +57,20 @@ public class AgentController {
         }
     }
 
-    @GetMapping("agent/answer")
+    @GetMapping("/agent/answer")
+    public Map<String, String> agentAnswer(@RequestBody Map<String, String> json) {
+        int userId = 1;
+        String ans = json.get("answer");
+        this.chatlogService.saveLog(userId, "agent", ans);
+        return json;
+    }
+    /*
     public String agentAnswer(@RequestParam String ans) {
         int userId = 1;
         this.chatlogService.saveLog(userId, "agent", ans);
         return ans;
     }
+    */
+    
+    
 }

@@ -1,7 +1,6 @@
-package com.capstone.agent.service;
-
-import com.capstone.agent.entity.Chatlog;
-import com.capstone.agent.repository.ChatlogRepository;
+package com.capstone.agent.legacy.service;
+import com.capstone.agent.legacy.entity.Chatlog;
+import com.capstone.agent.legacy.repository.ChatlogRepository;
 
 import org.springframework.stereotype.Service;
 

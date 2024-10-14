@@ -1,4 +1,4 @@
-package com.capstone.agent.dto;
+package com.capstone.agent.legacy.dto;
 
 import java.time.LocalDateTime;
 

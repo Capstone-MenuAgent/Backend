@@ -1,11 +1,11 @@
-package com.capstone.agent.controller;
-import com.capstone.agent.dto.LoginDTO;
-import com.capstone.agent.dto.SignupDTO;
-import com.capstone.agent.entity.Chatlog;
-import com.capstone.agent.dto.InfoDTO;
-import com.capstone.agent.dto.LogDTO;
-import com.capstone.agent.service.ChatlogService;
-import com.capstone.agent.service.UserService;
+package com.capstone.agent.legacy.controller;
+import com.capstone.agent.legacy.dto.LoginDTO;
+import com.capstone.agent.legacy.dto.SignupDTO;
+import com.capstone.agent.legacy.entity.Chatlog;
+import com.capstone.agent.legacy.dto.InfoDTO;
+import com.capstone.agent.legacy.dto.LogDTO;
+import com.capstone.agent.legacy.service.ChatlogService;
+import com.capstone.agent.legacy.service.UserService;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,11 +1,11 @@
-package com.capstone.agent.service;
-import org.springframework.stereotype.Service;
+package com.capstone.agent.legacy.service;
+import com.capstone.agent.legacy.dto.InfoDTO;
+import com.capstone.agent.legacy.dto.LoginDTO;
+import com.capstone.agent.legacy.dto.SignupDTO;
+import com.capstone.agent.legacy.entity.User;
+import com.capstone.agent.legacy.repository.UserRepository;
 
-import com.capstone.agent.dto.InfoDTO;
-import com.capstone.agent.dto.LoginDTO;
-import com.capstone.agent.dto.SignupDTO;
-import com.capstone.agent.entity.User;
-import com.capstone.agent.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
