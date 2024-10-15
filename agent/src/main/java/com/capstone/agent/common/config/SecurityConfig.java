@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -69,7 +68,7 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/member/signup", "/api/v1/member/login").permitAll() // 로그인 X여도 접속 가능
+                .requestMatchers("/api/v1/member/signup", "/api/v1/login").permitAll() // 로그인 X여도 접속 가능
                 .anyRequest().authenticated() // 위의 경로 외에는 인증해야 가능
             )
             .exceptionHandling(exceptionHandling -> exceptionHandling

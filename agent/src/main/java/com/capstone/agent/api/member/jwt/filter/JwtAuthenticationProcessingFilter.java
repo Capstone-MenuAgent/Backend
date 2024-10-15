@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +25,7 @@ import java.io.IOException;
 
 // JWT 인증 필터
 // 미리 허가된 URI 외의 요청 처리
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { // 클라이언트 요청에 1번 실행
     private static final String NO_CHECK_URL = "/login"; // "/login" 요청은 작동 X
@@ -81,6 +83,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
     // 유효하면 email 추출 및 멤버 객체 반환
     // 멤버 객체 인증 처리해서 다음 필터로 이동
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("checkAccessTokenAndAuthentication 호출");
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .ifPresent(accessToken -> jwtService.extractEmail(accessToken)

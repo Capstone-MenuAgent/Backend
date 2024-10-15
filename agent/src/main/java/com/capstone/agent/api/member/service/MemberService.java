@@ -1,6 +1,5 @@
 package com.capstone.agent.api.member.service;
 
-import com.capstone.agent.api.member.dto.LoginRequestDTO;
 import com.capstone.agent.api.member.dto.MemberInfoResponseDTO;
 import com.capstone.agent.api.member.dto.SignupRequestDTO;
 import com.capstone.agent.api.member.entity.Member;
@@ -19,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    //PasswordEncoder
 
     @Transactional
     public void signup(SignupRequestDTO signupRequest) {

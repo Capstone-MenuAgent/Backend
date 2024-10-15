@@ -9,11 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
+@Slf4j
 @RequiredArgsConstructor
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
     
@@ -36,6 +37,9 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
                     member.updateRefreshToken(refreshToken);
                     memberRepository.saveAndFlush(member);
                 });
+        log.info("로그인 성공 이메일 : {}", email);
+        log.info("로그인 성공 AccessToken : {}", accessToken);
+        log.info("만료 기간 AccessToken : {}", accessTokenExpiration);
     }
 
     private String extractUsername(Authentication authentication) {

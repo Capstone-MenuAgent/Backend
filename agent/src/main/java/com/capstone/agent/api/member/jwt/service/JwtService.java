@@ -11,6 +11,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Getter
 @RequiredArgsConstructor
@@ -81,12 +83,14 @@ public class JwtService {
     public void sendAccessToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setHeader(accessHeader, accessToken);
+        log.info("Access Token 재발급 : {}", accessToken);
     }
 
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setHeader(accessHeader, accessToken);
         response.setHeader(refreshHeader, refreshToken);
+        log.info("Access Token, Refresh Token Header 완료");
     }
 
     // 헤더에서 Access Token 추출
@@ -110,6 +114,7 @@ public class JwtService {
                     .getClaim(EMAIL_CLAIM)
                     .asString());
         } catch (Exception e) {
+            log.error("유효하지 않은 Access Token");
             return Optional.empty();
         }
     }
@@ -130,6 +135,7 @@ public class JwtService {
             JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
             return true;
         } catch (Exception e) {
+            log.error("유효하지 않은 토큰 {}", e.getMessage());
             return false;
         }
     }
