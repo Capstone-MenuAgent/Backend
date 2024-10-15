@@ -1,7 +1,13 @@
 package com.capstone.agent.common.config;
 
-import java.util.Arrays;
-import java.util.Collections;
+import com.capstone.agent.api.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
+import com.capstone.agent.api.login.handler.LoginFailureHandler;
+import com.capstone.agent.api.login.handler.LoginSuccessHandler;
+import com.capstone.agent.api.login.service.LoginService;
+import com.capstone.agent.api.member.jwt.service.JwtService;
+import com.capstone.agent.api.member.repository.MemberRepository;
+import com.capstone.agent.common.config.jwt.JwtConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,17 +28,12 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import com.capstone.agent.api.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
-import com.capstone.agent.api.login.handler.LoginFailureHandler;
-import com.capstone.agent.api.login.handler.LoginSuccessHandler;
-import com.capstone.agent.api.login.service.LoginService;
-import com.capstone.agent.api.member.jwt.filter.JwtAuthenticationProcessingFilter;
-import com.capstone.agent.api.member.jwt.service.JwtService;
-import com.capstone.agent.api.member.repository.MemberRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -43,42 +44,45 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
+    private final JwtConfig jwtConfig;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .formLogin(form -> form.disable()) // formLogin X
-            .httpBasic(basic -> basic.disable()) // httpBasic X
-            .csrf(csrf -> csrf.disable()) // csrf X
-            .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-                @Override
-                public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(Arrays.asList(
-                        "https://localhost:3000"
-                    ));
-                    config.setAllowedMethods(Collections.singletonList("*"));
-                    config.setAllowCredentials(true);
-                    config.setMaxAge(3600L); // 1 시간
-                    config.addExposedHeader("Authorization"); // 노출할 헤더 설정
-                    config.addExposedHeader("Authorization-Refresh");
-                    return config;
-                }
-            }))
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/member/signup", "/api/v1/login").permitAll() // 로그인 X여도 접속 가능
-                .anyRequest().authenticated() // 위의 경로 외에는 인증해야 가능
-            )
-            .exceptionHandling(exceptionHandling -> exceptionHandling
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // 인증되지 않은 유저가 요청 시 동작, 401 반환
-            );
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrf -> csrf.disable())
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.setAllowedOrigins(Arrays.asList(
+                            "http://localhost:3000",
+                            "http://localhost:5000",
+                            "http://localhost:8080"
+                        ));
+                        config.setAllowedHeaders(Collections.singletonList("*"));
+                        config.setAllowedMethods(Collections.singletonList("*"));
+                        config.setAllowCredentials(true);
+                        config.setMaxAge(3600L); // 1시간
+                        config.addExposedHeader("Authorization");
+                        config.addExposedHeader("Authorization-refresh");
+                        return config;
+                    }
+                }))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/v1/login", "/api/v1/member/signup").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                );
         
-        http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
-        // JWT 인증 처리
-        http.addFilterBefore(jwtAuthenticationProcessingFilter(), CustomJsonUsernamePasswordAuthenticationFilter.class);
-        
+                http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
+                http.addFilterBefore(jwtConfig.jwtAuthenticationProcessingFilter(), CustomJsonUsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -117,12 +121,4 @@ public class SecurityConfig {
     public LoginFailureHandler loginFailureHandler() {
         return new LoginFailureHandler();
     }
-
-    @Bean
-    public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter
-                = new JwtAuthenticationProcessingFilter(jwtService, memberRepository);
-        return jwtAuthenticationProcessingFilter;
-    }
-
 }
