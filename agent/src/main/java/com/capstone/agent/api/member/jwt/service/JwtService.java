@@ -1,6 +1,5 @@
 package com.capstone.agent.api.member.jwt.service;
 
-import com.capstone.agent.api.member.entity.Member;
 import com.capstone.agent.api.member.repository.MemberRepository;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -26,6 +24,7 @@ import java.util.Optional;
 @Getter
 @RequiredArgsConstructor
 public class JwtService {
+
     @Value("${jwt.key.secretKey}")
     private String secretKey;
 
@@ -44,11 +43,11 @@ public class JwtService {
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     private static final String EMAIL_CLAIM = "email";
-    private static final String BEARER = "Bearer";
+    private static final String BEARER = "Bearer ";
 
     private final MemberRepository memberRepository;
 
-    // Access Token 생성하기
+    // Access Token 생성
     public String createAccessToken(String email) {
         Date now = new Date();
         return JWT.create()
@@ -67,20 +66,7 @@ public class JwtService {
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
-    public Map<String, String> createAccessAndRefreshToken(String email) {
-        String accessToken = createAccessToken(email);
-        String refreshToken = createRefreshToken();
-
-        // Refresh Token 업데이트
-        updateRefreshToken(email, refreshToken);
-        
-        return Map.of(
-            "accessToken", accessToken,
-            "refreshToken", refreshToken
-        );
-    }
-
-    public void sendAccessToken(HttpServletResponse response, String accessToken, String refreshToken) {
+    public void sendAccessToken(HttpServletResponse response, String accessToken) {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setHeader(accessHeader, accessToken);
         log.info("Access Token 재발급 : {}", accessToken);
@@ -88,9 +74,18 @@ public class JwtService {
 
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
-        response.setHeader(accessHeader, accessToken);
-        response.setHeader(refreshHeader, refreshToken);
+
+        setAccessTokenHeader(response, accessToken);
+        setRefreshTokenHeader(response, refreshToken);
         log.info("Access Token, Refresh Token Header 완료");
+    }
+
+    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
+        response.setHeader(accessHeader, accessToken);
+    }
+
+    public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
+        response.setHeader(refreshHeader, refreshToken);
     }
 
     // 헤더에서 Access Token 추출
@@ -99,6 +94,7 @@ public class JwtService {
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
+    
     // 헤더에서 Refresh Token 추출
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(refreshHeader))
@@ -122,10 +118,7 @@ public class JwtService {
     @Transactional
     public void updateRefreshToken(String email, String refreshToken) {
         memberRepository.findByEmail(email).ifPresentOrElse(
-                member -> {
-                        Member updatedMember = member.updateRefreshToken(refreshToken);
-                        memberRepository.save(updatedMember);
-                },
+                member -> member.updateRefreshToken(refreshToken),
                 () -> new Exception("일치하는 회원이 없습니다")
         );
     }

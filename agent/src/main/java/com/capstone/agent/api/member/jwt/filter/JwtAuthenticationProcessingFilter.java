@@ -28,13 +28,13 @@ import java.io.IOException;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { // 클라이언트 요청에 1번 실행
-    private static final String NO_CHECK_URL = "/login"; // "/login" 요청은 작동 X
+    private static final String NO_CHECK_URL = "/api/v1/login"; // "/login" 요청은 작동 X
 
     private final JwtService jwtService;
     private final MemberRepository memberRepository;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (request.getRequestURI().equals(NO_CHECK_URL)) {
@@ -63,6 +63,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
 
     // refresh token으로 유저 검색 및 액세스와 refresh token 재발급
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refershToken) {
+        log.info("checkRefreshTokenAndReIssueAccessToken 호출");
         memberRepository.findByRefreshToken(refershToken)
                 .ifPresent(member -> {
                     String reIssuedRefreshToken = reIssueRefreshToken(member);
@@ -72,7 +73,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
 
     // refresh token 재발급, db에 refresh token 업데이트
     private String reIssueRefreshToken(Member member) {
-        String reIssuedRefreshToken  = jwtService.createRefreshToken();
+        String reIssuedRefreshToken = jwtService.createRefreshToken();
         member.updateRefreshToken(reIssuedRefreshToken);
         memberRepository.saveAndFlush(member);
         return reIssuedRefreshToken;
@@ -95,7 +96,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
     // 인증 허가
     public void saveAuthentication(Member member) {
         String password = member.getPassword();
-        // 소셜 로그인 적용 시 password == null인 경우를 위한 코드 작성 필요
 
         UserDetails userDetailsUser = User.builder()
                 .username(member.getEmail())
@@ -104,8 +104,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
                 .build();
         
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetailsUser, null, authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities())
-        );
+                userDetailsUser, null, authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
