@@ -34,7 +34,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 
         memberRepository.findByEmail(email)
                 .ifPresent(member -> {
-                    member.updateRefreshToken(refreshToken);
+                    member = member.updateRefreshToken(refreshToken);
                     memberRepository.saveAndFlush(member);
                 });
         log.info("로그인 성공 이메일 : {}", email);
