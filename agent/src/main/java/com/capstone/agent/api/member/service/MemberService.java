@@ -1,15 +1,17 @@
 package com.capstone.agent.api.member.service;
 
-import com.capstone.agent.api.member.dto.*;
-import com.capstone.agent.api.member.entity.*;
-import com.capstone.agent.api.member.repository.MemberRepository;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
+import com.capstone.agent.api.member.dto.LoginRequestDTO;
+import com.capstone.agent.api.member.dto.MemberInfoResponseDTO;
+import com.capstone.agent.api.member.dto.SignupRequestDTO;
+import com.capstone.agent.api.member.entity.Member;
+import com.capstone.agent.api.member.repository.MemberRepository;
 
-import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +28,19 @@ public class MemberService {
                             .age(signupRequest.getAge())
                             .gender(signupRequest.getGender())
                             .build();
+        validateDuplicateMember(member);
         memberRepository.save(member);
 
         // 유저에게 권한 부여
         Member updatedMember = member.authorizeMember();
         memberRepository.save(updatedMember);
+    }
+
+    private void validateDuplicateMember(Member member) {
+        memberRepository.findByEmail(member.getEmail())
+                .ifPresent(m -> {
+                    throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + member.getEmail());
+                });
     }
 
     @Transactional
