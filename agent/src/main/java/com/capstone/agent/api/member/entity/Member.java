@@ -1,7 +1,7 @@
 package com.capstone.agent.api.member.entity;
 
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -44,7 +44,7 @@ public class Member {
     @Column(name = "created_at", updatable = false)
     protected LocalDateTime createdAt;
 
-    @LastModifiedBy
+    @LastModifiedDate
     @Column(name = "updated_at")
     protected LocalDateTime updatedAt;
 
@@ -54,10 +54,16 @@ public class Member {
                     .build();
     }
 
+    public Member passwordEncoder(PasswordEncoder passwordEncoder) {
+        return this.toBuilder()
+                .password(passwordEncoder.encode(this.password))
+                .build();
+    }
+
     // refresh token 업데이트
     public Member updateRefreshToken(String updateRefreshToken) {
         return this.toBuilder()
-                    .refreshToken(updateRefreshToken)
-                    .build();
+                .refreshToken(updateRefreshToken)
+                .build();
     }
 }

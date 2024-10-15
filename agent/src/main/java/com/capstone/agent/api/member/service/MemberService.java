@@ -3,6 +3,7 @@ package com.capstone.agent.api.member.service;
 import com.capstone.agent.api.member.dto.MemberInfoResponseDTO;
 import com.capstone.agent.api.member.dto.SignupRequestDTO;
 import com.capstone.agent.api.member.entity.Member;
+import com.capstone.agent.api.member.entity.Role;
 import com.capstone.agent.api.member.repository.MemberRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,20 +22,20 @@ public class MemberService {
 
     @Transactional
     public void signup(SignupRequestDTO signupRequest) {
-        Member member = Member.builder()
+        Member rawMember = Member.builder()
                             .email(signupRequest.getEmail())
-                            .password(passwordEncoder.encode(signupRequest.getPassword()))
+                            .password(signupRequest.getPassword())
                             .name(signupRequest.getName())
                             .addr(signupRequest.getAddr())
                             .age(signupRequest.getAge())
                             .gender(signupRequest.getGender())
+                            .role(Role.USER)
                             .build();
+        Member member = rawMember.passwordEncoder(passwordEncoder);
+
+        // 존재하는 이메일인지 확인
         validateDuplicateMember(member);
         memberRepository.save(member);
-
-        // 유저에게 권한 부여
-        Member updatedMember = member.authorizeMember();
-        memberRepository.save(updatedMember);
     }
 
     private void validateDuplicateMember(Member member) {
