@@ -1,15 +1,16 @@
 package com.capstone.agent.api.member.service;
 
-import java.util.NoSuchElementException;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.capstone.agent.api.member.dto.LoginRequestDTO;
 import com.capstone.agent.api.member.dto.MemberInfoResponseDTO;
 import com.capstone.agent.api.member.dto.SignupRequestDTO;
 import com.capstone.agent.api.member.entity.Member;
 import com.capstone.agent.api.member.repository.MemberRepository;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,12 +18,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    //PasswordEncoder
 
     @Transactional
     public void signup(SignupRequestDTO signupRequest) {
         Member member = Member.builder()
                             .email(signupRequest.getEmail())
-                            .password(signupRequest.getPassword())
+                            .password(passwordEncoder.encode(signupRequest.getPassword()))
                             .name(signupRequest.getName())
                             .addr(signupRequest.getAddr())
                             .age(signupRequest.getAge())
@@ -41,16 +44,6 @@ public class MemberService {
                 .ifPresent(m -> {
                     throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + member.getEmail());
                 });
-    }
-
-    @Transactional
-    public Long login(LoginRequestDTO loginRequest) { // security config 작성 예정
-        Member member = memberRepository.findByEmail(loginRequest.getEmail()) // 추후 변경 예정
-                            .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
-        if (!member.getPassword().equals(loginRequest.getPassword())) {       // 추후 변경 예정
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
-        }
-        return member.getId();
     }
 
     @Transactional

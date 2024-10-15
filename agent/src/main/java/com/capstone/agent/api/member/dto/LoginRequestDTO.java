@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class LoginRequestDTO {
     private String email;
-    private String password; // 추후 암호화 예정
+    private String password;
 }

@@ -3,6 +3,7 @@ package com.capstone.agent.api.member.entity;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,8 +26,6 @@ public class Member {
 
     @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
     private String password;
 
     private String name;
@@ -52,6 +51,13 @@ public class Member {
     public Member authorizeMember() {
         return this.toBuilder()
                     .role(Role.USER)
+                    .build();
+    }
+
+    // refresh token 업데이트
+    public Member updateRefreshToken(String updateRefreshToken) {
+        return this.toBuilder()
+                    .refreshToken(updateRefreshToken)
                     .build();
     }
 }
