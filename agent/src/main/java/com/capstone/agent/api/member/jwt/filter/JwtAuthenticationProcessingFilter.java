@@ -95,11 +95,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
 
     // 인증 허가
     public void saveAuthentication(Member member) {
-        String password = member.getPassword();
-
         UserDetails userDetailsUser = User.builder()
                 .username(member.getEmail())
-                .password(password)
+                .password(member.getPassword())
                 .roles(member.getRole().name())
                 .build();
         
@@ -107,6 +105,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
                 userDetailsUser, null, authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Authentication authenticationLogCheck = SecurityContextHolder.getContext().getAuthentication();
+        if (authenticationLogCheck != null) {
+            log.info("현재 인증된 사용자: {}", authentication.getName());
+        } else {
+            log.info("인증 정보가 존재하지 않습니다.");
+        }
     }
 
 }

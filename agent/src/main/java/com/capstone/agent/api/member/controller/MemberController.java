@@ -21,10 +21,15 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public HttpStatus signup(@RequestBody SignupRequestDTO signupRequest) {
+    public HttpStatus signup(@RequestBody SignupRequestDTO signupRequest) throws Exception {
         memberService.signup(signupRequest);
         
         return HttpStatus.OK;
+    }
+
+    @GetMapping("/jwt-test")
+    public String jwtTest() {
+        return "jwt test 요청 성공";
     }
 
     @PostMapping("/quit")
