@@ -55,16 +55,34 @@ public class MemberService {
     @Transactional
     public MemberInfoResponseDTO memberInfo(Long userId) {
         Member member = memberRepository.findById(userId)
-                            .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
+
         MemberInfoResponseDTO memberInfoResponse = MemberInfoResponseDTO.builder()
-                                                        .id(member.getId())
-                                                        .email(member.getEmail())
-                                                        .name(member.getName())
-                                                        .addr(member.getAddr())
-                                                        .age(member.getAge())
-                                                        .gender(member.getGender())
-                                                        .role(member.getRole())
-                                                        .build();
+                .id(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .addr(member.getAddr())
+                .age(member.getAge())
+                .gender(member.getGender())
+                .role(member.getRole())
+                .build();
+        return memberInfoResponse;
+    }
+
+    @Transactional
+    public MemberInfoResponseDTO memberInfo(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
+
+        MemberInfoResponseDTO memberInfoResponse = MemberInfoResponseDTO.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .addr(member.getAddr())
+                .age(member.getAge())
+                .gender(member.getGender())
+                .role(member.getRole())
+                .build();
         return memberInfoResponse;
     }
 }
