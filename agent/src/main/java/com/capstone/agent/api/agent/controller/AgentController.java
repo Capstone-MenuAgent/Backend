@@ -50,13 +50,14 @@ public class AgentController {
         try {
             HttpHeaders headers = new HttpHeaders();
             String encodedQuery = URLEncoder.encode(query, "UTF-8");
+            Long memberId = memberInfo.getId();
             String encodedAddr = URLEncoder.encode(memberInfo.getAddr(), "UTF-8");
             String encodedGender = URLEncoder.encode(memberInfo.getGender().toString(), "UTF-8");
             int age = memberInfo.getAge();
-            String encodedParams = String.format("?query=%s&loc=%s&gender=%s&age=%d", encodedQuery, encodedAddr, encodedGender, age);
+            String encodedParams = String.format("?query=%s&id=%d&loc=%s&gender=%s&age=%d", encodedQuery, memberId, encodedAddr, encodedGender, age);
             String agentPort = "5000";
             String newURL = String.format(
-                    "%s://%s:%s/question/%s",
+                    "%s://%s:%s/agent/question%s",
                     request.getScheme(),
                     request.getServerName(),
                     agentPort,
