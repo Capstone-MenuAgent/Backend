@@ -3,6 +3,8 @@ package com.capstone.agent.api.member.jwt.service;
 import com.capstone.agent.api.member.repository.MemberRepository;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
@@ -16,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
+import java.util.concurrent.TimeUnit;
 import java.util.Date;
 import java.util.Optional;
 
@@ -46,24 +49,32 @@ public class JwtService {
     private static final String BEARER = "Bearer ";
 
     private final MemberRepository memberRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     // Access Token 생성
     public String createAccessToken(String email) {
         Date now = new Date();
-        return JWT.create()
+        String accessToken = JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
                 .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod))
                 .withClaim(EMAIL_CLAIM, email)
                 .sign(Algorithm.HMAC512(secretKey)); // 512는 최소 64 bytes, 권장 128 bytes
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("accessToken:"+email, accessToken, accessTokenExpirationPeriod, TimeUnit.MILLISECONDS);
+
+        return accessToken;
     }
 
     // Refresh Token 생성하기
-    public String createRefreshToken() {
+    public String createRefreshToken(String email) {
         Date now = new Date();
-        return JWT.create()
+        String refreshToken = JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
                 .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set("refreshToken:"+email, refreshToken, refreshTokenExpirationPeriod, TimeUnit.MILLISECONDS);
+        return refreshToken;
     }
 
     public void sendAccessToken(HttpServletResponse response, String accessToken) {
@@ -86,6 +97,30 @@ public class JwtService {
 
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
         response.setHeader(refreshHeader, refreshToken);
+    }
+
+    // Redis에서 Access Token 추출
+    public Optional<String> getAccessTokenFromRedis(String email) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        return Optional.ofNullable(valueOperations.get("accessToken:"+email));
+    }
+
+    // Redis에서 Refresh Token 추출
+    public Optional<String> getRefreshTokenFromRedis(String email) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        return Optional.ofNullable(valueOperations.get("refreshToken:"+email));
+    }
+
+    // Access Token 삭제 (로그아웃 시 사용)
+    public void deleteAccessToken(String email) {
+        redisTemplate.delete("accessToken:" + email);
+        log.info("Redis에서 Access Token 삭제됨: {}", email);
+    }
+
+    // Refresh Token 삭제 (로그아웃 시 사용)
+    public void deleteRefreshToken(String email) {
+        redisTemplate.delete("refreshToken:" + email);
+        log.info("Redis에서 Refresh Token 삭제됨: {}", email);
     }
 
     // 헤더에서 Access Token 추출
