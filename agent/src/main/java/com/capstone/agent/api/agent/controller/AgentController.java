@@ -1,5 +1,8 @@
 package com.capstone.agent.api.agent.controller;
 
+import com.capstone.agent.api.agent.dto.ChatLogDTO;
+import com.capstone.agent.api.agent.entity.Role;
+import com.capstone.agent.api.agent.service.HistoryService;
 import com.capstone.agent.api.member.dto.MemberInfoResponseDTO;
 import com.capstone.agent.api.member.jwt.service.JwtService;
 import com.capstone.agent.api.member.service.MemberService;
@@ -34,6 +37,7 @@ import java.util.Map;
 public class AgentController {
 
     private final MemberService memberService;
+    private final HistoryService historyService;
     private final JwtService jwtService;
 
     @GetMapping("/question")
@@ -46,7 +50,17 @@ public class AgentController {
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
         MemberInfoResponseDTO memberInfo = memberService.memberInfo(email);
+
         log.info("User ID: {}, Role: {}, Query: {}", memberInfo.getId(), memberInfo.getRole(), query);
+
+        // question log 저장
+        ChatLogDTO chatLogDTO = ChatLogDTO.builder()
+                .memberId(memberInfo.getId())
+                .log(query)
+                .role(Role.HUMAN)
+                .build();
+        historyService.saveLog(chatLogDTO);
+
         try {
             HttpHeaders headers = new HttpHeaders();
             String encodedQuery = URLEncoder.encode(query, "UTF-8");
@@ -73,7 +87,16 @@ public class AgentController {
     @GetMapping("/answer")
     public Map<String, String> agnetAnswer(@RequestBody Map<String, String> json, HttpServletRequest request) {
         log.info("User ID: {}, Role: Agent, Query: {}", json.get("id"), json.get("answer"));
+        
+        // question log 저장
+        ChatLogDTO chatLogDTO = ChatLogDTO.builder()
+                .memberId(Long.parseLong(json.get("id")))
+                .log(json.get("answer"))
+                .role(Role.COMPUTER)
+                .build();
+        historyService.saveLog(chatLogDTO);
 
         return json;
     }
+
 }
