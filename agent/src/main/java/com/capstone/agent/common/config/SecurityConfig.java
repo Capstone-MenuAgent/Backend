@@ -73,6 +73,7 @@ public class SecurityConfig {
                 }))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/login", "/api/v1/member/signup").permitAll()
+                        .requestMatchers("/HelloPage").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
