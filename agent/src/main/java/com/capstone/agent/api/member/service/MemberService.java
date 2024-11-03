@@ -1,6 +1,6 @@
 package com.capstone.agent.api.member.service;
 
-import com.capstone.agent.api.member.dto.MemberInfoResponseDTO;
+import com.capstone.agent.api.member.dto.MemberInfoDTO;
 import com.capstone.agent.api.member.dto.SignupRequestDTO;
 import com.capstone.agent.api.member.entity.Member;
 import com.capstone.agent.api.member.entity.Role;
@@ -53,11 +53,11 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberInfoResponseDTO memberInfo(Long userId) {
+    public MemberInfoDTO memberInfo(Long userId) {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
 
-        MemberInfoResponseDTO memberInfoResponse = MemberInfoResponseDTO.builder()
+        MemberInfoDTO memberInfoDTO = MemberInfoDTO.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
@@ -66,15 +66,15 @@ public class MemberService {
                 .gender(member.getGender())
                 .role(member.getRole())
                 .build();
-        return memberInfoResponse;
+        return memberInfoDTO;
     }
 
     @Transactional
-    public MemberInfoResponseDTO memberInfo(String email) {
+    public MemberInfoDTO memberInfo(String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
 
-        MemberInfoResponseDTO memberInfoResponse = MemberInfoResponseDTO.builder()
+        MemberInfoDTO memberInfoDTO = MemberInfoDTO.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
@@ -83,6 +83,20 @@ public class MemberService {
                 .gender(member.getGender())
                 .role(member.getRole())
                 .build();
-        return memberInfoResponse;
+        return memberInfoDTO;
+    }
+
+    @Transactional
+    public void modify(MemberInfoDTO memberInfoDTO) {
+        Member member = memberRepository.findByEmail(memberInfoDTO.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 멤버"))
+                .toBuilder()
+                        .name(memberInfoDTO.getName())
+                        .addr(memberInfoDTO.getAddr())
+                        .age(memberInfoDTO.getAge())
+                        .gender(memberInfoDTO.getGender())
+                        .build();
+
+        memberRepository.save(member);
     }
 }
