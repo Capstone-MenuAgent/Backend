@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -97,6 +98,15 @@ public class AgentController {
         historyService.saveLog(chatLogDTO);
 
         return json;
+    }
+
+    @GetMapping("/question-test")
+    @ResponseBody
+    public String questionTest(@RequestParam String query, HttpServletRequest request) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:5001/agent/question_test?query=오늘 뭐 먹지&id=2&loc=한국교통대학교 충주캠퍼스&gender=남&age=25";
+        String response = restTemplate.getForObject(url, String.class);
+        return response;
     }
 
 }
