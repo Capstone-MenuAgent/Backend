@@ -23,7 +23,7 @@ import com.capstone.agent.api.agent.dto.QuestionDTO;
 import com.capstone.agent.api.agent.entity.Role;
 import com.capstone.agent.api.agent.service.AgentService;
 import com.capstone.agent.api.agent.service.HistoryService;
-import com.capstone.agent.api.member.dto.MemberInfoResponseDTO;
+import com.capstone.agent.api.member.dto.MemberInfoDTO;
 import com.capstone.agent.api.member.jwt.service.JwtService;
 import com.capstone.agent.api.member.service.MemberService;
 
@@ -52,7 +52,7 @@ public class AgentController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
-        MemberInfoResponseDTO memberInfo = memberService.memberInfo(email);
+        MemberInfoDTO memberInfo = memberService.memberInfo(email);
 
         log.info("User ID: {}, Role: {}, Query: {}", memberInfo.getId(), memberInfo.getRole(), query);
 
