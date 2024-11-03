@@ -12,7 +12,7 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
     Optional<History> findById(Long id);
 
     Optional<History> findByMemberId(Long memberId);
-    List<History> findAllByMemberId(Long memberId);
+    Optional<List<History>> findAllByMemberId(Long memberId);
 
     Optional<History> findByIdAndMemberId(Long id, Long memberId);
 }

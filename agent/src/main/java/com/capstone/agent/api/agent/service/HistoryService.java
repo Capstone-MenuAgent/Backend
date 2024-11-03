@@ -26,8 +26,8 @@ public class HistoryService {
     }
 
     public List<History> loadHistory(Long memberId) {
-        historyRepository.findByMemberId(memberId)
+        List<History> history = historyRepository.findAllByMemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
-        return historyRepository.findAllByMemberId(memberId);
+        return history;
     }
 }
