@@ -7,7 +7,6 @@ import lombok.Data;
 @Builder
 public class QuestionDTO {
     private String query;
-    private Long id;
     private String location;
     private String gender;
     private int age;

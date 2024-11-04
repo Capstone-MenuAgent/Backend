@@ -16,35 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AgentService {
     private final WebClient webClient;
-
-    public String getAgentQuestion(QuestionDTO question) {
-        String response = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("http")
-                        .host("localhost")
-                        .port(5001)
-                        .path("/agent/question_test")
-                        .queryParam("query", question.getQuery())
-                        .queryParam("id", question.getId())
-                        .queryParam("loc", question.getLocation())
-                        .queryParam("gender", question.getGender())
-                        .queryParam("age", question.getAge())
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        return response;
-    }
-
     public HashMap<String, String> getAgentQuestionHash(QuestionDTO question) {
         HashMap<String, String> response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("http")
                         .host("localhost")
                         .port(5001)
-                        .path("/agent/question_test")
+                        .path("/agent/question")
                         .queryParam("query", question.getQuery())
-                        .queryParam("id", question.getId())
                         .queryParam("loc", question.getLocation())
                         .queryParam("gender", question.getGender())
                         .queryParam("age", question.getAge())

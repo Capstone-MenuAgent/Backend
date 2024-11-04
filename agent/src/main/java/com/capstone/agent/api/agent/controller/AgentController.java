@@ -67,7 +67,6 @@ public class AgentController {
         try {
             QuestionDTO question = QuestionDTO.builder()
                     .query(query)
-                    .id(memberInfo.getId())
                     .location(memberInfo.getAddr())
                     .gender(memberInfo.getGender().toString())
                     .age(memberInfo.getAge())
