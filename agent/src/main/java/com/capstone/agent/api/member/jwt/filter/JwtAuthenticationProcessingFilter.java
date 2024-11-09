@@ -67,10 +67,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
     }
 
     // refresh token으로 유저 검색 및 액세스와 refresh token 재발급
-    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refershToken) {
+    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
         log.info("checkRefreshTokenAndReIssueAccessToken 호출");
-        memberRepository.findByRefreshToken(refershToken)
+        memberRepository.findByRefreshToken(refreshToken)
                 .ifPresent(member -> {
+                    log.info("리프레시 토큰 확인 완료");
                     String reIssuedRefreshToken = reIssueRefreshToken(member);
                     jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(member.getEmail()), reIssuedRefreshToken);
                 });
@@ -78,9 +79,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
 
     // refresh token 재발급, db에 refresh token 업데이트
     private String reIssueRefreshToken(Member member) {
+        log.info("refreshToken 재발급 및 DB 저장");
         String reIssuedRefreshToken = jwtService.createRefreshToken();
-        member.updateRefreshToken(reIssuedRefreshToken);
-        memberRepository.saveAndFlush(member);
+        jwtService.updateRefreshToken(member.getEmail(), reIssuedRefreshToken);
+        // member.updateRefreshToken(reIssuedRefreshToken);
+        // memberRepository.saveAndFlush(member);
         return reIssuedRefreshToken;
     }
 

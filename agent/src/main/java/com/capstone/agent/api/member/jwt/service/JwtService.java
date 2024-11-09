@@ -4,6 +4,7 @@ import com.capstone.agent.api.member.repository.MemberRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
@@ -118,7 +118,9 @@ public class JwtService {
     @Transactional
     public void updateRefreshToken(String email, String refreshToken) {
         memberRepository.findByEmail(email).ifPresentOrElse(
-                member -> member.updateRefreshToken(refreshToken),
+                member -> {
+                    member.updateRefreshToken(refreshToken);
+                    memberRepository.save(member);},
                 () -> new Exception("일치하는 회원이 없습니다")
         );
     }
