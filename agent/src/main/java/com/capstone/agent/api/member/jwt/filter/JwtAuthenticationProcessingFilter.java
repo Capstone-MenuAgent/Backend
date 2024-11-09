@@ -28,7 +28,7 @@ import java.io.IOException;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { // 클라이언트 요청에 1번 실행
-    private static final String NO_CHECK_URL = "/api/v1/login"; // "/login" 요청은 작동 X
+    private static final String NO_CHECK_URL = "/v1/login"; // "/login" 요청은 작동 X
 
     private final JwtService jwtService;
     private final MemberRepository memberRepository;

@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/history")
+@RequestMapping("/v1/history")
 public class HistoryContoller {
     private final HistoryService historyService;
     private final JwtService jwtService;
