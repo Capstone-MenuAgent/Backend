@@ -72,8 +72,7 @@ public class SecurityConfig {
                     }
                 }))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/login", "/api/v1/member/signup").permitAll()
-                        .requestMatchers("/HelloPage").permitAll()
+                        .requestMatchers("/v1/login", "/v1/member/signup", "/v1/member/check-email").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

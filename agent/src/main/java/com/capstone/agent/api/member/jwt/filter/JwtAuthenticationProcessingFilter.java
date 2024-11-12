@@ -34,12 +34,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter { //
     private final MemberRepository memberRepository;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getRequestURI().startsWith("/HelloPage");
-    }
-
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (request.getRequestURI().equals(NO_CHECK_URL)) {
