@@ -5,6 +5,8 @@ import com.capstone.agent.api.member.dto.SignupRequestDTO;
 import com.capstone.agent.api.member.entity.Member;
 import com.capstone.agent.api.member.entity.Role;
 import com.capstone.agent.api.member.repository.MemberRepository;
+import com.capstone.agent.common.response.ErrorStatus;
+import com.capstone.agent.common.exception.BadRequestException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -34,15 +38,26 @@ public class MemberService {
         Member member = rawMember.passwordEncoder(passwordEncoder);
 
         // 존재하는 이메일인지 확인
-        validateDuplicateMember(member);
-        memberRepository.save(member);
+        checkEmail(member.getEmail());
+        try {
+            memberRepository.save(member);
+            //
+        } catch (BadRequestException e) {
+            log.error(ErrorStatus.FAIL_SAVE_USER_INFO.getMessage(), e);
+            throw new BadRequestException(ErrorStatus.FAIL_SAVE_USER_INFO.getMessage());
+        }
+        
     }
 
-    private void validateDuplicateMember(Member member) {
-        memberRepository.findByEmail(member.getEmail())
-                .ifPresent(m -> {
-                    throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + member.getEmail());
-                });
+    @Transactional
+    public void checkEmail(String email) {
+        validEmail(email);
+    }
+
+    private void validEmail(String email) {
+        if (memberRepository.existsByEmail(email)) {
+            throw new BadRequestException(ErrorStatus.DUPLICATE_EMAIL.getMessage());
+        }
     }
 
     @Transactional

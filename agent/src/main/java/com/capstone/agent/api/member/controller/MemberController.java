@@ -6,8 +6,10 @@ import com.capstone.agent.api.member.dto.InfoResponseDTO;
 import com.capstone.agent.api.member.dto.SignupRequestDTO;
 import com.capstone.agent.api.member.jwt.service.JwtService;
 import com.capstone.agent.api.member.service.MemberService;
-
-import jakarta.servlet.http.HttpServletRequest;
+import com.capstone.agent.common.response.ApiResponse;
+import com.capstone.agent.common.exception.BadRequestException;
+import com.capstone.agent.common.response.ErrorStatus;
+import com.capstone.agent.common.response.SuccessStatus;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,22 +32,18 @@ public class MemberController {
     private final JwtService jwtService;
 
     @PostMapping("/signup")
-    public HttpStatus signup(@RequestBody SignupRequestDTO signupRequest) throws Exception {
+    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody SignupRequestDTO signupRequest) {
         memberService.signup(signupRequest);
-        
-        return HttpStatus.OK;
+        return ApiResponse.success_only(SuccessStatus.CREATE_USER_SUCCESS);
     }
 
-    @GetMapping("/jwt-test")
-    public String jwtTest() {
-        return "jwt test 요청 성공";
-    }
-
-    @PostMapping("/quit")
-    public HttpStatus quitMember(@RequestParam Long userId) {
-        memberService.quitMember(userId);
-        
-        return HttpStatus.OK;
+    @PostMapping("/check-email")
+    public ResponseEntity<ApiResponse<Void>> checkEmail(@RequestParam("email") String email) {
+        if (email == null || email.isEmpty()) {
+            throw new BadRequestException(ErrorStatus.MISSING_EMAIL.getMessage());
+        }
+        memberService.checkEmail(email);
+        return ApiResponse.success_only(SuccessStatus.CHECK_EMAIL_SUCCESS);
     }
 
     @GetMapping("/memberInfo")
