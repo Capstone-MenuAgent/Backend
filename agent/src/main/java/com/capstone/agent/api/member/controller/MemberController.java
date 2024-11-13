@@ -37,7 +37,7 @@ public class MemberController {
         return ApiResponse.success_only(SuccessStatus.CREATE_USER_SUCCESS);
     }
 
-    @PostMapping("/check-email")
+    @GetMapping("/check-email")
     public ResponseEntity<ApiResponse<Void>> checkEmail(@RequestParam("email") String email) {
         if (email == null || email.isEmpty()) {
             throw new BadRequestException(ErrorStatus.MISSING_EMAIL.getMessage());
